@@ -21,6 +21,14 @@
         <div id="game-board">
             <!-- Tiles will be generated dynamically using JavaScript -->
         </div>
+        
+        <!-- Game Over Overlay -->
+        <div id="game-over-overlay" class="hidden">
+            <div class="game-over-message">
+                <p>Game Over</p>
+                <button onclick="restartGame()">Restart Game</button>
+            </div>
+        </div>
     </div>
     
     <p>Use arrow keys to move tiles. Combine tiles with the same number to reach 2048!</p>

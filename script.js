@@ -32,6 +32,34 @@ function resetHighScore() {
     document.getElementById('high-score').textContent = `High Score: ${highScore}`;
 }
 
+// Check if there are any moves left
+function isGameOver() {
+    for (let row = 0; row < gridSize; row++) {
+        for (let col = 0; col < gridSize; col++) {
+            if (grid[row][col] === null) return false;
+            if (col < gridSize - 1 && grid[row][col] === grid[row][col + 1]) return false;
+            if (row < gridSize - 1 && grid[row][col] === grid[row + 1][col]) return false;
+        }
+    }
+    return true;
+}
+
+// Show the Game Over overlay
+function showGameOver() {
+    document.getElementById('game-over-overlay').classList.remove('hidden');
+}
+
+// Hide the Game Over overlay and restart the game
+function restartGame() {
+    currentScore = 0;
+    document.getElementById('current-score').textContent = `Score: ${currentScore}`;
+    document.getElementById('game-over-overlay').classList.add('hidden');
+    grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
+    addNewTile();
+    addNewTile();
+    renderBoard();
+}
+
 // Add a new tile to an empty cell
 function addNewTile() {
     let emptyCells = [];
@@ -43,7 +71,7 @@ function addNewTile() {
     
     if (emptyCells.length > 0) {
         let { row, col } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        grid[row][col] = Math.random() > 0.9 ? 4 : 2; // 10% chance of 4, otherwise 2
+        grid[row][col] = Math.random() > 0.9 ? 4 : 2;
         renderBoard();
     }
 }
@@ -51,7 +79,7 @@ function addNewTile() {
 // Render the game board
 function renderBoard() {
     const gameBoard = document.getElementById('game-board');
-    gameBoard.innerHTML = ''; // Clear current tiles
+    gameBoard.innerHTML = '';
     
     for (let row = 0; row < gridSize; row++) {
         for (let col = 0; col < gridSize; col++) {
@@ -65,6 +93,7 @@ function renderBoard() {
             gameBoard.appendChild(tile);
         }
     }
+    if (isGameOver()) showGameOver();
 }
 
 // Move and merge tiles based on direction
@@ -95,8 +124,6 @@ function slide(direction) {
     
     if (moved) {
         addNewTile();
-    } else {
-        console.log("No tiles moved");
     }
 }
 
@@ -120,24 +147,23 @@ function merge(line, reverse) {
 
 // Handle arrow key input for tile movement
 function handleKeyPress(event) {
-    switch (event.key) {
-        case 'ArrowUp':
-            slide('up');
-            break;
-        case 'ArrowDown':
-            slide('down');
-            break;
-        case 'ArrowLeft':
-            slide('left');
-            break;
-        case 'ArrowRight':
-            slide('right');
-            break;
-        default:
-            console.log("Invalid key press"); // For debugging
-            return;
+    if (document.getElementById('game-over-overlay').classList.contains('hidden')) {
+        switch (event.key) {
+            case 'ArrowUp':
+                slide('up');
+                break;
+            case 'ArrowDown':
+                slide('down');
+                break;
+            case 'ArrowLeft':
+                slide('left');
+                break;
+            case 'ArrowRight':
+                slide('right');
+                break;
+        }
+        renderBoard();
     }
-    renderBoard();
 }
 
 // Initialize the game
