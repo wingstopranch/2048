@@ -96,42 +96,43 @@ function renderBoard() {
     if (isGameOver()) showGameOver();
 }
 
-// Move and merge tiles based on direction
+// Slide and merge all rows or columns in the given direction
 function slide(direction) {
     let moved = false;
-    
+
     if (direction === 'up' || direction === 'down') {
         for (let col = 0; col < gridSize; col++) {
             let line = [];
             for (let row = 0; row < gridSize; row++) {
                 line.push(grid[row][col]);
             }
-            let mergedLine = merge(line, direction === 'down');
+            let newLine = processLine(line, direction === 'down');
             for (let row = 0; row < gridSize; row++) {
-                if (grid[row][col] !== mergedLine[row]) moved = true;
-                grid[row][col] = mergedLine[row];
+                if (grid[row][col] !== newLine[row]) moved = true;
+                grid[row][col] = newLine[row];
             }
         }
     } else if (direction === 'left' || direction === 'right') {
         for (let row = 0; row < gridSize; row++) {
-            let mergedLine = merge(grid[row], direction === 'right');
+            let newLine = processLine(grid[row], direction === 'right');
             for (let col = 0; col < gridSize; col++) {
-                if (grid[row][col] !== mergedLine[col]) moved = true;
-                grid[row][col] = mergedLine[col];
+                if (grid[row][col] !== newLine[col]) moved = true;
+                grid[row][col] = newLine[col];
             }
         }
     }
-    
-    if (moved) {
-        addNewTile();
-    }
+
+    if (moved) addNewTile();
 }
 
-// Merge tiles in a line, based on direction
-function merge(line, reverse) {
+// Process a single row or column by sliding and merging tiles
+function processLine(line, reverse) {
     if (reverse) line.reverse();
+
+    // Slide all tiles to the front
     let newLine = line.filter(value => value !== null);
-    
+
+    // Merge tiles
     for (let i = 0; i < newLine.length - 1; i++) {
         if (newLine[i] === newLine[i + 1]) {
             newLine[i] *= 2;
@@ -140,7 +141,10 @@ function merge(line, reverse) {
             newLine.push(null);
         }
     }
+
+    // Fill the rest with nulls to keep the line length consistent
     while (newLine.length < gridSize) newLine.push(null);
+
     if (reverse) newLine.reverse();
     return newLine;
 }
